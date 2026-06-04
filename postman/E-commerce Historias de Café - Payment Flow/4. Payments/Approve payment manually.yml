@@ -1,0 +1,22 @@
+info:
+  name: Approve payment manually
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/payments/{{paymentId}}/status?status=APPROVED&transactionNumber=MP-123456"
+  params:
+    - name: status
+      value: APPROVED
+      type: query
+    - name: transactionNumber
+      value: MP-123456
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

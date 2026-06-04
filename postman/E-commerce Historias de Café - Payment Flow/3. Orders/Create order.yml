@@ -1,0 +1,43 @@
+info:
+  name: Create order
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/orders"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "userId": {{userId}},
+        "stateOrder": "En proceso",
+        "details": [
+          {
+            "productId": {{productId}},
+            "quantityProducts": 2
+          }
+        ]
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        test('Order created', function () {
+            expect(res.getStatus()).to.be.oneOf([200, 201]);
+        });
+        const order = res.getBody();
+        if (order.id) {
+            pm.collectionVariables.set('orderId', order.id);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,22 @@
+info:
+  name: Reject payment manually
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/payments/{{paymentId}}/status?status=REJECTED&transactionNumber=MP-REJECTED-123456"
+  params:
+    - name: status
+      value: REJECTED
+      type: query
+    - name: transactionNumber
+      value: MP-REJECTED-123456
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

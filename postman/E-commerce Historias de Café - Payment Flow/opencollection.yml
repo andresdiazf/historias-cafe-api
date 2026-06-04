@@ -1,0 +1,29 @@
+opencollection: 1.0.0
+
+info:
+  name: E-commerce Historias de Café - Payment Flow
+
+request:
+  variables:
+    - name: baseUrl
+      value: http://localhost:8080
+    - name: userId
+      value: "1"
+    - name: productId
+      value: ""
+    - name: orderId
+      value: ""
+    - name: paymentId
+      value: ""
+    - name: paymentUrl
+      value: ""
+
+docs:
+  content: Colección para probar el flujo Product -> Order -> Payment con Mercado Pago.
+  type: text/markdown
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

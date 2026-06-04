@@ -1,0 +1,98 @@
+package com.historias_de_cafe.backend.service;
+
+import com.historias_de_cafe.backend.DTO.ProductRequestDTO;
+import com.historias_de_cafe.backend.DTO.ProductResponseDTO;
+import com.historias_de_cafe.backend.model.Categories;
+import com.historias_de_cafe.backend.model.Product;
+import com.historias_de_cafe.backend.repository.CategoriesRepository;
+import com.historias_de_cafe.backend.repository.ProductRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional
+public class ProductService {
+
+    private final ProductRepository productRepository;
+    private final CategoriesRepository categoriesRepository;
+
+    public ProductService(ProductRepository productRepository, CategoriesRepository categoriesRepository) {
+        this.productRepository = productRepository;
+        this.categoriesRepository = categoriesRepository;
+    }
+
+    public ProductResponseDTO create(ProductRequestDTO dto) {
+        Categories category = categoriesRepository.findById(dto.getCategoryId().intValue())
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + dto.getCategoryId()));
+
+        Product product = new Product();
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setStock(dto.getStock());
+        product.setCategories(category);
+        product.setImage(dto.getImage());
+        product.setOrigin(dto.getOrigin());
+        product.setRoast(dto.getRoast());
+
+        return toResponseDto(productRepository.save(product));
+    }
+
+    @Transactional(readOnly = true)
+    public ProductResponseDTO getById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+        return toResponseDto(product);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductResponseDTO> getAll() {
+        return productRepository.findByActiveTrue()
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    public ProductResponseDTO update(Long id, ProductRequestDTO dto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+        Categories category = categoriesRepository.findById(dto.getCategoryId().intValue())
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + dto.getCategoryId()));
+
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setStock(dto.getStock());
+        product.setCategories(category);
+        product.setImage(dto.getImage());
+        product.setOrigin(dto.getOrigin());
+        product.setRoast(dto.getRoast());
+
+        return toResponseDto(productRepository.save(product));
+    }
+
+    public void delete(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+        product.setActive(false);
+        productRepository.save(product);
+    }
+
+    private ProductResponseDTO toResponseDto(Product product) {
+        Categories category = product.getCategories();
+        return new ProductResponseDTO(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStock(),
+                category != null ? category.getId().longValue() : null,
+                category != null ? category.getPresentation() : null,
+                product.getImage(),
+                product.getOrigin(),
+                product.getRoast()
+        );
+    }
+}

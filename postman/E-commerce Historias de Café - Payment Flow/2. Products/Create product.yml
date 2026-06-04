@@ -1,0 +1,40 @@
+info:
+  name: Create product
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/products"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Café Especial",
+        "description": "Café molido premium",
+        "price": 25000,
+        "stock": 10,
+        "categorieId": 1
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        test('Product created', function () {
+            expect(res.getStatus()).to.be.oneOf([200, 201]);
+        });
+        const product = res.getBody();
+        if (product.id) {
+            pm.collectionVariables.set('productId', product.id);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

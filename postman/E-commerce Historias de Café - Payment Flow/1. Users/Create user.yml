@@ -1,0 +1,40 @@
+info:
+  name: Create user
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/users"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Usuario Prueba",
+        "email": "usuario.prueba@example.com",
+        "passwordHash": "password123",
+        "role": "CUSTOMER",
+        "stateActive": true
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        test('User created', function () {
+            expect(res.getStatus()).to.be.oneOf([200, 201]);
+        });
+        const user = res.getBody();
+        if (user.id) {
+            pm.collectionVariables.set('userId', user.id);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

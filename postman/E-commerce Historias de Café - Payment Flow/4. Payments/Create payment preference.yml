@@ -1,0 +1,40 @@
+info:
+  name: Create payment preference
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/payments"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "orderId": {{orderId}}
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        test('Payment preference created', function () {
+            expect(res.getStatus()).to.be.oneOf([200, 201]);
+        });
+        const payment = res.getBody();
+        if (payment.id) {
+            pm.collectionVariables.set('paymentId', payment.id);
+        }
+        if (payment.paymentUrl) {
+            pm.collectionVariables.set('paymentUrl', payment.paymentUrl);
+            console.log('Open paymentUrl:', payment.paymentUrl);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
