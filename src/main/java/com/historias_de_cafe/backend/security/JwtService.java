@@ -20,7 +20,8 @@ public class JwtService {
     @Value("${jwt.secret:historias-de-cafe-jwt-secret-key-change-in-production-2026}")
     private String secret;
 
-    @Value("${jwt.expiration-ms:86400000}")
+    //@Value("${jwt.expiration-ms:86400000}")
+    @Value("${jwt.expiration-ms:3600000}")
     private long expirationMs;
 
     public String generateToken(UserDetails userDetails) {
